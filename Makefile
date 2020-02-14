@@ -15,11 +15,12 @@
 # This makefile is purposefully kept simple to support GNU and BSD make.
 
 LOCAL_CPPFLAGS += -I.
-LIBS = -ldl -llttng-ust
+LIBS_INSTRUMENTED_APP = -ldl -llttng-ust
+LIBS_NOTIFICATION_CLIENT = -ldl -llttng-ctl
 AM_V_P := :
 AR ?= ar
 
-all: instrumented-app
+all: instrumented-app notification-client
 
 tp.o: tp.c tp.h
 	@if $(AM_V_P); then set -x; else echo "  CC       $@"; fi; \
@@ -38,8 +39,18 @@ instrumented-app.o: instrumented-app.c
 instrumented-app: instrumented-app.o tp.a
 	@if $(AM_V_P); then set -x; else echo "  CCLD     $@"; fi; \
 		$(CC) -o $@ $(LDFLAGS) $(CPPFLAGS) $(AM_LDFLAGS) $(AM_CFLAGS) \
-		$(CFLAGS) instrumented-app.o tp.a $(LIBS)
+		$(CFLAGS) instrumented-app.o tp.a $(LIBS_INSTRUMENTED_APP)
+
+notification-client.o: notification-client.c
+	@if $(AM_V_P); then set -x; else echo "  CC       $@"; fi; \
+		$(CC) $(CPPFLAGS) $(LOCAL_CPPFLAGS) $(AM_CFLAGS) $(AM_CPPFLAGS) \
+		$(CFLAGS) -c -o $@ $<
+
+notification-client: notification-client.o
+	@if $(AM_V_P); then set -x; else echo "  CCLD     $@"; fi; \
+		$(CC) -o $@ $(LDFLAGS) $(CPPFLAGS) $(AM_LDFLAGS) $(AM_CFLAGS) \
+		$(CFLAGS) notification-client.o tp.a $(LIBS_NOTIFICATION_CLIENT)
 
 .PHONY: clean
 clean:
-	rm -f *.o *.a instrumented-app
+	rm -f *.o *.a instrumented-app notification-client
