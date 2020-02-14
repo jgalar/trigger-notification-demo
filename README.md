@@ -19,7 +19,7 @@ An application that emits the `trigger_exemple:my_event` event every 2 seconds.
 
 This script adds a trigger named `demo_trigger` which emits a notification when the user-space `trigger_exemple:my_event` event occurs.
 
-Once the trigger has been setup, it the notification-client is launched to print all notifications emitted by the `demo_trigger` trigger.
+Once the trigger has been setup, the notification-client is launched to print all notifications emitted by the `demo_trigger` trigger.
 
 ## Building
 
